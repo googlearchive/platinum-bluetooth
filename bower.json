@@ -6,7 +6,7 @@
   "authors": [
     "The Polymer Authors"
   ],
-  "description": "A Platinum element on top of the Web Bluetooth API",
+  "description": "A set of Polymer elements to discover and communicate with nearby Bluetooth devices",
   "keywords": [
     "bluetooth"
   ],
