@@ -337,7 +337,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var self = this;
         return this._characteristic.readValue()
           .then(function(value) {
-            self._setValue(value);
+            self.value = value;
             return self.value;
           });
       },
