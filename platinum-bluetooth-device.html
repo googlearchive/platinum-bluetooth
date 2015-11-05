@@ -83,7 +83,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
          */
         servicesFilter: {
           type: Array,
-          observer: '_servicesFilterChanged'
+          observer: '_filterChanged'
+        },
+
+        /**
+         * Device name filter.
+         */
+        nameFilter: {
+          type: String,
+          observer: '_filterChanged'
+        },
+
+        /**
+         * Device name prefix filter.
+         */
+        namePrefixFilter: {
+          type: String,
+          observer: '_filterChanged'
+        },
+
+        /**
+         * Optional Bluetooth GATT services to get access to. You may provide
+         * either the full Bluetooth UUID as a string or a short 16- or 32-bit
+         * form as integers like 0x180d.
+         */
+        optionalServices: {
+          type: Array,
+          observer: '_filterChanged'
         },
 
         /**
@@ -104,9 +130,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
 
       /**
-       * Reset device when services-filter property is changed.
+       * Reset device when services-filter, name-filter or name-prefix-filter property is changed.
        */
-      _servicesFilterChanged: function() {
+      _filterChanged: function() {
         this._device = null;
       },
 
@@ -139,7 +165,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        *
        * @return {Promise<BluetoothDevice>}
        */
-      request: function() {
+      request: function(options) {
         if (!this.supported) {
           return Promise.reject(new Error('Your browser does not support Bluetooth'));
         }
@@ -148,11 +174,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           // Resolve promise if user already picked one device.
           return Promise.resolve(this._device);
         }
-        if (!this.servicesFilter || this.servicesFilter.length == 0) {
-          return Promise.reject(new Error('Please set Bluetooth services filter.'));
+        options = options||{};
+        if ((!this.servicesFilter || this.servicesFilter.length == 0)
+                &&!this.nameFilter&&!this.namePrefixFilter) {
+          if (!(options.filters&&options.filters.length)) {
+            return Promise.reject(new Error('Please set Bluetooth services, name and/or name prefix filter.'));
+          }
+        } else {
+          options.filters = options.filters||[];
+          options.filters.push({
+            services: this.servicesFilter,
+            name: this.nameFilter,
+            namePrefix: this.namePrefixFilter
+          })
         }
+        options.optionalServices = this.optionalServices||options.optionalServices;
+
         var self = this;
-        return navigator.bluetooth.requestDevice({filters:[{services: this.servicesFilter}]})
+        return navigator.bluetooth.requestDevice(options)
           .then(function(device) {
             // Cache device for later use.
             self._device = device;
