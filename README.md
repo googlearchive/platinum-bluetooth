@@ -7,6 +7,9 @@ platinum-bluetooth-characteristic.html  platinum-bluetooth-device.html
 Edit those files, and our readme bot will duplicate them over here!
 Edit this file, and the bot will squash your changes :)
 
+The bot does some handling of markdown. Please file a bug if it does the wrong
+thing! https://github.com/PolymerLabs/tedium/issues
+
 -->
 
 _[Demo and API Docs](https://elements.polymer-project.org/elements/platinum-bluetooth)_
@@ -14,10 +17,9 @@ _[Demo and API Docs](https://elements.polymer-project.org/elements/platinum-blue
 
 ##&lt;platinum-bluetooth-characteristic&gt;
 
-
 The `<platinum-bluetooth-characteristic>` element allows you to [read
-and write characteristics on nearby bluetooth devices][1] thanks to the
-young [Web Bluetooth API][2]. It is currently only partially implemented
+and write characteristics on nearby bluetooth devices](https://developers.google.com/web/updates/2015/07/interact-with-ble-devices-on-the-web) thanks to the
+young [Web Bluetooth API](https://github.com/WebBluetoothCG/web-bluetooth). It is currently only partially implemented
 in Chrome OS 45 behind the experimental flag
 `chrome://flags/#enable-web-bluetooth`.
 
@@ -35,6 +37,7 @@ device advertising Battery service:
   </platinum-bluetooth-characteristic>
 </platinum-bluetooth-device>
 ```
+
 ```js
 var bluetoothDevice = document.querySelector('platinum-bluetooth-device');
 var batteryLevel = document.querySelector('platinum-bluetooth-characteristic');
@@ -61,6 +64,7 @@ bluetooth device advertising Heart Rate service:
   </platinum-bluetooth-characteristic>
 </platinum-bluetooth-device>
 ```
+
 ```js
 var bluetoothDevice = document.querySelector('platinum-bluetooth-device');
 var heartRateCtrlPoint = document.querySelector('platinum-bluetooth-characteristic');
@@ -91,6 +95,7 @@ a data-bound field in response to a read.
 ...
 <span>{{bodySensorLocation}}</span>
 ```
+
 ```js
 var bluetoothDevice = document.querySelector('platinum-bluetooth-device');
 var bodySensorLocation = document.querySelector('platinum-bluetooth-characteristic');
@@ -115,6 +120,7 @@ You can also use changes in `value` to drive characteristic writes when
   </platinum-bluetooth-characteristic>
 </platinum-bluetooth-device>
 ```
+
 ```js
 var bluetoothDevice = document.querySelector('platinum-bluetooth-device');
 var heartRateCtrlPoint = document.querySelector('platinum-bluetooth-characteristic');
@@ -133,16 +139,12 @@ heartRateCtrlPoint.addEventListener('platinum-bluetooth-auto-write-error',
 });
 ```
 
-[1]: https://developers.google.com/web/updates/2015/07/interact-with-ble-devices-on-the-web
-[2]: https://github.com/WebBluetoothCG/web-bluetooth
-
 
 
 ##&lt;platinum-bluetooth-device&gt;
 
-
 The `<platinum-bluetooth-device>` element allows you to [discover nearby
-bluetooth devices][1] thanks to the young [Web Bluetooth API][2]. It is
+bluetooth devices](https://developers.google.com/web/updates/2015/07/interact-with-ble-devices-on-the-web) thanks to the young [Web Bluetooth API](https://github.com/WebBluetoothCG/web-bluetooth). It is
 currently only partially implemented in Chrome OS 45 behind the
 experimental flag `chrome://flags/#enable-web-bluetooth`.
 
@@ -157,6 +159,7 @@ Battery service :
     services-filter='["battery_service"]'>
 </platinum-bluetooth-device>
 ```
+
 ```js
 button.addEventListener('click', function() {
   document.querySelector('platinum-bluetooth-device').request()
@@ -164,8 +167,5 @@ button.addEventListener('click', function() {
   .catch(function(error) { console.error(error); });
 });
 ```
-
-[1]: https://developers.google.com/web/updates/2015/07/interact-with-ble-devices-on-the-web
-[2]: https://github.com/WebBluetoothCG/web-bluetooth
 
 
