@@ -127,8 +127,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         getBatteryLevelButton.addEventListener('click', function() {
           batteryDevice.request().then(function(device) {
             return batteryLevel.read().then(function(value) {
-              var data = new DataView(value);
-              template.text = device.name + ' Battery Level is ' + data.getUint8(0) + '%';
+              template.text = device.name + ' Battery Level is ' + value.getUint8(0) + '%';
               progressBar.indeterminate = false;
             })
           })
@@ -138,9 +137,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         getBodySensorLocationButton.addEventListener('click', function() {
           heartRateDevice.request().then(function(device) {
             return bodySensorLocation.read().then(function(value) {
-              var data = new DataView(value);
               var loc = ['other', 'chest', 'wrist', 'finger', 'hand', 'ear lobe', 'foot'];
-              template.text = device.name + ' Body sensor is placed on the ' + loc[data.getUint8(0)];
+              template.text = device.name + ' Body sensor is placed on the ' + loc[value.getUint8(0)];
               progressBar.indeterminate = false;
             })
           })

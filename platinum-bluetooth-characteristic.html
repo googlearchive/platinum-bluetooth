@@ -65,8 +65,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      * button.addEventListener('click', function() {
      *   bluetoothDevice.request().then(function() {
      *     return batteryLevel.read().then(function(value) {
-     *       var data = new DataView(value);
-     *       console.log('Battery Level is ' + data.getUint8(0) + '%');
+     *       console.log('Battery Level is ' + value.getUint8(0) + '%');
      *     });
      *   })
      *   .catch(function(error) { });
@@ -193,7 +192,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           * Value gets populated with the characteristic value when it's read.
          */
         value: {
-          type: ArrayBuffer,
+          type: DataView,
           observer: '_valueChanged',
           notify: true
         },
@@ -329,7 +328,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * Returns a promise that will resolve when Bluetooth GATT Characteristic
        * is read.
        *
-       * @return {Promise<ArrayBuffer>}
+       * @return {Promise<DataView>}
        */
       _readCharacteristic: function() {
         if (!this._characteristic) {
@@ -338,6 +337,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var self = this;
         return this._characteristic.readValue()
           .then(function(value) {
+            // In Chrome 50+, a DataView is returned instead of an ArrayBuffer.
+            value = value.buffer ? value : new DataView(value);
             self.value = value;
             return self.value;
           });
@@ -389,7 +390,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * Returns a promise that will resolve when Bluetooth GATT Characteristic
        * is read.
        *
-       * @return {Promise<ArrayBuffer>} The value of this Bluetooth GATT Characteristic.
+       * @return {Promise<DataView>} The value of this Bluetooth GATT Characteristic.
        */
       read: function() {
         var self = this;
