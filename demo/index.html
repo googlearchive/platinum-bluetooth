@@ -72,7 +72,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-progress></paper-progress>
           <paper-button id="get-battery-level" raised>Get Battery Level</paper-button>
           <paper-button id="get-body-sensor-location" raised>Get Body Sensor Location</paper-button>
+          <br/>
           <paper-button id="reset-energy-expended" raised>Reset Energy Expended</paper-button>
+          <br/>
+          <paper-button id="start-notifications" raised>Start Heart Rate Notifications</paper-button>
+          <paper-button id="stop-notifications" raised>Stop Heart Rate Notifications</paper-button>
         </paper-item-body>
       </paper-item>
 
@@ -85,16 +89,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <platinum-bluetooth-device services-filter='["battery_service"]' id="battery-device">
       <platinum-bluetooth-service service="battery_service">
-        <platinum-bluetooth-characteristic characteristic="battery_level" value={{batteryLevel}}>
+        <platinum-bluetooth-characteristic characteristic="battery_level">
         </platinum-bluetooth-characteristic>
       </platinum-bluetooth-service>
     </platinum-bluetooth-device>
 
     <platinum-bluetooth-device services-filter='["heart_rate"]' id="heart-rate-device">
       <platinum-bluetooth-service service="heart_rate">
-        <platinum-bluetooth-characteristic characteristic="body_sensor_location" value={{bodySensorLocation}}>
+        <platinum-bluetooth-characteristic characteristic="body_sensor_location">
         </platinum-bluetooth-characteristic>
         <platinum-bluetooth-characteristic characteristic="heart_rate_control_point">
+        </platinum-bluetooth-characteristic>
+        <platinum-bluetooth-characteristic characteristic="heart_rate_measurement">
         </platinum-bluetooth-characteristic>
       </platinum-bluetooth-service>
     </platinum-bluetooth-device>
@@ -110,10 +116,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var heartRateDevice = document.getElementById('heart-rate-device');
         var bodySensorLocation = heartRateDevice.querySelector('[characteristic=body_sensor_location]');
         var heartRateControlPoint = heartRateDevice.querySelector('[characteristic=heart_rate_control_point]');
+        var heartRateMeasurement = heartRateDevice.querySelector('[characteristic=heart_rate_measurement]');
 
         var getBatteryLevelButton = document.getElementById('get-battery-level');
         var getBodySensorLocationButton = document.getElementById('get-body-sensor-location');
         var resetEnergyExpendedButton = document.getElementById('reset-energy-expended');
+        var startNotificationsButton = document.getElementById('start-notifications');
+        var stopNotificationsButton = document.getElementById('stop-notifications');
         var progressBar = document.querySelector('paper-progress');
 
         var buttons = document.querySelectorAll('paper-button');
@@ -153,6 +162,62 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           })
           .catch(onError);
         });
+
+        startNotificationsButton.addEventListener('click', function() {
+          heartRateDevice.request().then(function(device) {
+            return heartRateMeasurement.startNotifications().then(function() {
+              template.text = device.name + ' Notifications session has started.';
+              progressBar.indeterminate = false;
+              heartRateMeasurement.addEventListener('value-changed', parseHeartRate);
+            })
+          })
+          .catch(onError);
+        });
+
+        stopNotificationsButton.addEventListener('click', function() {
+          heartRateDevice.request().then(function(device) {
+            return heartRateMeasurement.stopNotifications().then(function() {
+              template.text = device.name + ' Notifications session has stopped.';
+              progressBar.indeterminate = false;
+              heartRateMeasurement.removeEventListener('value-changed', parseHeartRate);
+            })
+          })
+          .catch(onError);
+        });
+
+        function parseHeartRate(event) {
+          let data = event.target.value;
+          let flags = data.getUint8(0);
+          let rate16Bits = flags & 0x1;
+          let result = {};
+          let index = 1;
+          if (rate16Bits) {
+            result.heartRate = data.getUint16(index, /*littleEndian=*/true);
+            index += 2;
+          } else {
+            result.heartRate = data.getUint8(index);
+            index += 1;
+          }
+          let contactDetected = flags & 0x2;
+          let contactSensorPresent = flags & 0x4;
+          if (contactSensorPresent) {
+            result.contactDetected = !!contactDetected;
+          }
+          let energyPresent = flags & 0x8;
+          if (energyPresent) {
+            result.energyExpended = data.getUint16(index, /*littleEndian=*/true);
+            index += 2;
+          }
+          let rrIntervalPresent = flags & 0x10;
+          if (rrIntervalPresent) {
+            let rrIntervals = [];
+            for (; index + 1 < data.byteLength; index += 2) {
+              rrIntervals.push(data.getUint16(index, /*littleEndian=*/true));
+            }
+            result.rrIntervals = rrIntervals;
+          }
+          template.text = JSON.stringify(result, null, 2);
+        }
 
         function buttonClick() {
           progressBar.indeterminate = true;

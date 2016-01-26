@@ -105,7 +105,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      * ```html
      * <platinum-bluetooth-device services-filter='["heart_rate"]'>
      *   <platinum-bluetooth-service service='heart_rate'>
-     *     <platinum-bluetooth-characteristic characteristic='body_sensor_location' value={{bodySensorLocation}}>
+     *     <platinum-bluetooth-characteristic characteristic='body_sensor_location'
+     *                                        value={{bodySensorLocation}}>
      *     </platinum-bluetooth-characteristic>
      *   </platinum-bluetooth-service>
      * </platinum-bluetooth-device>
@@ -124,13 +125,50 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      * });
      * ```
      *
+     * Starting and stopping notifications on a `<platinum-bluetooth-characteristic>` is pretty straightforward when taking advantage of [Polymer Change notification protocol](https://www.polymer-project.org/1.0/docs/devguide/data-binding.html#change-notification-protocol). Here's how to get your Heart Rate Measurement for instance:
+     *
+     * ```html
+     * <platinum-bluetooth-device services-filter='["heart_rate"]'>
+     *   <platinum-bluetooth-service service='heart_rate'>
+     *     <platinum-bluetooth-characteristic characteristic='heart_rate_measurement'>
+     *     </platinum-bluetooth-characteristic>
+     *   </platinum-bluetooth-service>
+     * </platinum-bluetooth-device>
+     * ```
+     * ```js
+     * var bluetoothDevice = document.querySelector('platinum-bluetooth-device');
+     * var heartRate = document.querySelector('platinum-bluetooth-characteristic');
+     *
+     * startButton.addEventListener('click', function() {
+     *   bluetoothDevice.request().then(function() {
+     *     return heartRate.startNotifications().then(function() {
+     *       heartRate.addEventListener('value-changed', handleValueChanged);
+     *     });
+     *   })
+     *   .catch(function(error) { });
+     * });
+     *
+     * stopButton.addEventListener('click', function() {
+     *   heartRate.stopNotifications().then(function() {
+     *     heartRate.removeEventListener('value-changed', handleValueChanged);
+     *   })
+     *   .catch(function(error) { });
+     * });
+     *
+     * function handleValueChanged(event) {
+     *  let value = event.target.value;
+     *  // Do something with the DataView Object value...
+     * }
+     * ```
+     *
      * You can also use changes in `value` to drive characteristic writes when
      * `auto-write` property is set to true.
      *
      * ```html
      * <platinum-bluetooth-device services-filter='["heart_rate"]'>
      *   <platinum-bluetooth-service service='heart_rate'>
-     *     <platinum-bluetooth-characteristic characteristic='heart_rate_control_point' auto-write>
+     *     <platinum-bluetooth-characteristic characteristic='heart_rate_control_point'
+                                              auto-write>
      *     </platinum-bluetooth-characteristic>
      *   </platinum-bluetooth-service>
      * </platinum-bluetooth-device>
@@ -177,7 +215,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         /**
-          * Value gets populated with the characteristic value when it's read.
+          * Value gets populated with the characteristic value when it's read
+          * and during a notification session.
          */
         value: {
           type: DataView,
@@ -233,6 +272,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        *
        * @event platinum-bluetooth-auto-write-error
        * @param {String} The error message
+       */
+
+      /**
+       * Fired when value gets changed during a notification session.
+       *
+       * @event value-changed
+       * @param {DataView} The value
        */
 
       /**
@@ -347,6 +393,42 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
 
       /**
+        * Save value when characteristic value changed in a notification session.
+        **/
+      _handleValueChanged: function(event) {
+        // In Chrome 50+, a DataView is returned instead of an ArrayBuffer.
+        this.value = event.target.value.buffer ? event.target.value : new DataView(event.target.value);
+      },
+
+      /**
+       * Returns a promise that will resolve when Bluetooth GATT Characteristic
+       * notification session starts.
+       *
+       * @return {Promise<void>}
+       */
+      _startNotifications: function() {
+        if (!this._characteristic) {
+          return Promise.reject(new Error('Bluetooth GATT Characteristic is not connected.'));
+        }
+        this._characteristic.addEventListener('characteristicvaluechanged', this._handleValueChanged.bind(this));
+        return this._characteristic.startNotifications();
+      },
+
+      /**
+       * Returns a promise that will resolve when Bluetooth GATT Characteristic
+       * notification session stops.
+       *
+       * @return {Promise<void>}
+       */
+      _stopNotifications: function() {
+        if (!this._characteristic) {
+          return Promise.reject(new Error('Bluetooth GATT Characteristic is not connected.'));
+        }
+        this._characteristic.removeEventListener('characteristicvaluechanged', this._handleValueChanged.bind(this));
+        return this._characteristic.stopNotifications();
+      },
+
+      /**
        * Reset internal cache when service property is changed.
        */
       _serviceChanged: function() {
@@ -401,6 +483,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           .then(function() { return self._getPrimaryService() })
           .then(function() { return self._getCharacteristic() })
           .then(function() { return self._writeCharacteristic(value) })
+      },
+
+      /**
+       * Returns a promise that will resolve when Bluetooth GATT Characteristic
+       * notification session starts.
+       *
+       * @return {Promise<void>}
+       */
+      startNotifications: function() {
+        var self = this;
+        return this._connectToDevice()
+          .then(function() { return self._getPrimaryService() })
+          .then(function() { return self._getCharacteristic() })
+          .then(function() { return self._startNotifications() })
+      },
+
+      /**
+       * Returns a promise that will resolve when Bluetooth GATT Characteristic
+       * notification session stops.
+       *
+       * @return {Promise<void>}
+       */
+      stopNotifications: function() {
+        var self = this;
+        return this._connectToDevice()
+          .then(function() { return self._getPrimaryService() })
+          .then(function() { return self._getCharacteristic() })
+          .then(function() { return self._stopNotifications() })
       },
 
     });
