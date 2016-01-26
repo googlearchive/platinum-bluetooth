@@ -22,6 +22,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <link rel="import" href="../../paper-button/paper-button.html">
 
     <link rel="import" href="../platinum-bluetooth-device.html">
+    <link rel="import" href="../platinum-bluetooth-service.html">
     <link rel="import" href="../platinum-bluetooth-characteristic.html">
 
     <style>
@@ -83,23 +84,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </paper-material>
 
     <platinum-bluetooth-device services-filter='["battery_service"]' id="battery-device">
-      <platinum-bluetooth-characteristic
-          service="battery_service"
-          characteristic="battery_level"
-          value={{batteryLevel}}>
-      </platinum-bluetooth-characteristic>
+      <platinum-bluetooth-service service="battery_service">
+        <platinum-bluetooth-characteristic characteristic="battery_level" value={{batteryLevel}}>
+        </platinum-bluetooth-characteristic>
+      </platinum-bluetooth-service>
     </platinum-bluetooth-device>
 
     <platinum-bluetooth-device services-filter='["heart_rate"]' id="heart-rate-device">
-      <platinum-bluetooth-characteristic
-          service="heart_rate"
-          characteristic="body_sensor_location"
-          value={{bodySensorLocation}}>
-      </platinum-bluetooth-characteristic>
-      <platinum-bluetooth-characteristic
-          service="heart_rate"
-          characteristic="heart_rate_control_point">
-      </platinum-bluetooth-characteristic>
+      <platinum-bluetooth-service service="heart_rate">
+        <platinum-bluetooth-characteristic characteristic="body_sensor_location" value={{bodySensorLocation}}>
+        </platinum-bluetooth-characteristic>
+        <platinum-bluetooth-characteristic characteristic="heart_rate_control_point">
+        </platinum-bluetooth-characteristic>
+      </platinum-bluetooth-service>
     </platinum-bluetooth-device>
     </template>
 

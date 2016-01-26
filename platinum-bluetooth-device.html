@@ -11,7 +11,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <dom-module id="platinum-bluetooth-device">
   <template>
-    <content id="characteristics" select="platinum-bluetooth-characteristic">
+    <content id="services" select="platinum-bluetooth-service">
     </content>
   </template>
 </dom-module>
@@ -35,7 +35,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      * experimental flag `chrome://flags/#enable-web-bluetooth`.
      *
      * `<platinum-bluetooth-device>` is used as a parent element for
-     * `<platinum-bluetooth-characteristic>` child elements.
+     * `<platinum-bluetooth-service>` child elements.
      *
      * For instance, here's how to request a nearby bluetooth device advertising
      * Battery service :
@@ -97,10 +97,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
 
       /**
-      * Update all characteristics when device changes.
+       * Update all services when device changes.
        */
       _deviceChanged: function() {
-        this._updateCharacteristics();
+        this._services = Polymer.dom(this.$.services).getDistributedNodes();
+        for (var i = 0; i < this._services.length; i++) {
+          this._services[i]._device = this._device;
+        }
       },
 
       /**
@@ -110,18 +113,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this._device = null;
       },
 
-      /**
-       * Set the internal device object on each characteristic child.
-       */
-      _updateCharacteristics: function() {
-        this._characteristics = Polymer.dom(this.$.characteristics).getDistributedNodes();
-        for (var i = 0; i < this._characteristics.length; i++) {
-          this._characteristics[i]._device = this._device;
-        }
-      },
-
       created: function() {
-        this._characteristics = [];
+        this._services = [];
       },
 
       /**
@@ -144,7 +137,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return Promise.reject(new Error('Your browser does not support Bluetooth'));
         }
         if (this._device) {
-          this._updateCharacteristics();
+          this._deviceChanged();
           // Resolve promise if user already picked one device.
           return Promise.resolve(this._device);
         }

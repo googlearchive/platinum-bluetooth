@@ -45,17 +45,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      * `chrome://flags/#enable-web-bluetooth`.
      *
      * `<platinum-bluetooth-characteristic>` needs to be a child of a
-     * `<platinum-bluetooth-device>` element.
+     * `<platinum-bluetooth-service>` element.
      *
      * For instance, here's how to read battery level from a nearby bluetooth
      * device advertising Battery service:
      *
      * ```html
      * <platinum-bluetooth-device services-filter='["battery_service"]'>
-     *   <platinum-bluetooth-characteristic
-     *       service='battery_service'
-     *       characteristic='battery_level'>
-     *   </platinum-bluetooth-characteristic>
+     *   <platinum-bluetooth-service service='battery_service'>
+     *     <platinum-bluetooth-characteristic characteristic='battery_level'>
+     *     </platinum-bluetooth-characteristic>
+     *   </platinum-bluetooth-service>
      * </platinum-bluetooth-device>
      * ```
      * ```js
@@ -77,10 +77,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      *
      * ```html
      * <platinum-bluetooth-device services-filter='["heart_rate"]'>
-     *   <platinum-bluetooth-characteristic
-     *       service='heart_rate'
-     *       characteristic='heart_rate_control_point'>
-     *   </platinum-bluetooth-characteristic>
+     *   <platinum-bluetooth-service service='heart_rate'>
+     *     <platinum-bluetooth-characteristic characteristic='heart_rate_control_point'>
+     *     </platinum-bluetooth-characteristic>
+     *   </platinum-bluetooth-service>
      * </platinum-bluetooth-device>
      * ```
      * ```js
@@ -104,11 +104,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      *
      * ```html
      * <platinum-bluetooth-device services-filter='["heart_rate"]'>
-     *   <platinum-bluetooth-characteristic
-     *       service='heart_rate'
-     *       characteristic='body_sensor_location'
-     *       value={{bodySensorLocation}}>
-     *   </platinum-bluetooth-characteristic>
+     *   <platinum-bluetooth-service service='heart_rate'>
+     *     <platinum-bluetooth-characteristic characteristic='body_sensor_location' value={{bodySensorLocation}}>
+     *     </platinum-bluetooth-characteristic>
+     *   </platinum-bluetooth-service>
      * </platinum-bluetooth-device>
      * ...
      * <span>{{bodySensorLocation}}</span>
@@ -130,11 +129,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      *
      * ```html
      * <platinum-bluetooth-device services-filter='["heart_rate"]'>
-     *   <platinum-bluetooth-characteristic
-     *       service='heart_rate'
-     *       characteristic='heart_rate_control_point'
-     *       auto-write>
-     *   </platinum-bluetooth-characteristic>
+     *   <platinum-bluetooth-service service='heart_rate'>
+     *     <platinum-bluetooth-characteristic characteristic='heart_rate_control_point' auto-write>
+     *     </platinum-bluetooth-characteristic>
+     *   </platinum-bluetooth-service>
      * </platinum-bluetooth-device>
      * ```
      * ```js
@@ -167,16 +165,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       is: 'platinum-bluetooth-characteristic',
 
       properties: {
-
-        /**
-         * Required Bluetooth GATT primary service. You may provide either the
-         * full Bluetooth UUID as a string or a short 16- or 32-bit form as
-         * integers like 0x180d.
-         */
-        service: {
-          type: String,
-          observer: '_serviceChanged'
-        },
 
         /**
          * Required Bluetooth GATT characteristic for read and write operations.
