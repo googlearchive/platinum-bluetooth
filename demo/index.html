@@ -77,6 +77,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <br/>
           <paper-button id="start-notifications" raised>Start Heart Rate Notifications</paper-button>
           <paper-button id="stop-notifications" raised>Stop Heart Rate Notifications</paper-button>
+          <br/>
+          <paper-button id="disconnect" raised>Disconnect</paper-button>
         </paper-item-body>
       </paper-item>
 
@@ -123,6 +125,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var resetEnergyExpendedButton = document.getElementById('reset-energy-expended');
         var startNotificationsButton = document.getElementById('start-notifications');
         var stopNotificationsButton = document.getElementById('stop-notifications');
+        var disconnectButton = document.getElementById('disconnect');
         var progressBar = document.querySelector('paper-progress');
 
         var buttons = document.querySelectorAll('paper-button');
@@ -183,6 +186,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             })
           })
           .catch(onError);
+        });
+
+        disconnectButton.addEventListener('click', function() {
+          heartRateDevice.disconnect();
+          batteryDevice.disconnect();
+          template.text = 'Bluetooth device(s) disconnected.';
+          progressBar.indeterminate = false;
         });
 
         function parseHeartRate(event) {

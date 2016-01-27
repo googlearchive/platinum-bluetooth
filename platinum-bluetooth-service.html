@@ -108,6 +108,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       },
 
+      /**
+       * Disconnect GATT Server instances on each characteristic child.
+       */
+      _disconnectGattServer: function() {
+        this._characteristics = Polymer.dom(this.$.characteristics).getDistributedNodes();
+        for (var i = 0; i < this._characteristics.length; i++) {
+          this._characteristics[i]._disconnectGattServer();
+        }
+      },
+
       created: function() {
         this._characteristics = [];
       },

@@ -288,7 +288,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * @return {Promise<BluetoothGATTRemoteServer>}
        */
       _connectToDevice: function() {
-        if (this._server) {
+        if (this._server && this._server.connected) {
           // Resolve promise if device is already connected.
           return Promise.resolve(this._server);
         }
@@ -310,7 +310,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * @return {Promise<BluetoothGATTService>}
        */
       _getPrimaryService: function() {
-        if (this._service &&
+        if (this._server && this._server.connected && this._service &&
             this._service.uuid === BluetoothUUID.getService(this.service)) {
           // Resolve promise if primary service is already discovered.
           return Promise.resolve(this._service);
@@ -455,6 +455,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           });
         }
       },
+      /**
+       * Disconnect GATT Server connection.
+       */
+      _disconnectGattServer: function() {
+        if (this._server && this._server.connected) {
+          this._server.disconnect();
+        }
+      },
+
 
       /**
        * Returns a promise that will resolve when Bluetooth GATT Characteristic
