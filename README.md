@@ -12,6 +12,8 @@ thing! https://github.com/PolymerLabs/tedium/issues
 
 -->
 
+[![Build Status](https://travis-ci.org/PolymerElements/platinum-bluetooth.svg?branch=master)](https://travis-ci.org/PolymerElements/platinum-bluetooth)
+
 _[Demo and API Docs](https://elements.polymer-project.org/elements/platinum-bluetooth)_
 
 
