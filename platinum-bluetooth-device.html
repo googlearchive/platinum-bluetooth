@@ -38,11 +38,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      * `<platinum-bluetooth-service>` child elements.
      *
      * For instance, here's how to request a nearby bluetooth device advertising
-     * Battery service :
+     * Battery service:
      *
      * ```html
-     * <platinum-bluetooth-device
-     *     services-filter='["battery_service"]'>
+     * <platinum-bluetooth-device services-filter='["battery_service"]'>
      * </platinum-bluetooth-device>
      * ```
      * ```js
@@ -51,6 +50,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      *   .then(function(device) { console.log(device.name); })
      *   .catch(function(error) { console.error(error); });
      * });
+     * ```
+     *
+     * You can also request a nearby bluetooth device by setting a filter on
+     * a name or name Prefix:
+     *
+     * ```html
+     * <platinum-bluetooth-device name-filter='foobar'>
+     * </platinum-bluetooth-device>
+     * ```
+     * ```html
+     * <platinum-bluetooth-device name-prefix-filter='foo'>
+     * </platinum-bluetooth-device>
+     * ```
+     *
+     * And you can combine some of the filters as well. Here's how to request a
+     * nearby bluetooth device advertising Battery service and whose name is
+     * "foobar":
+     *
+     * ```html
+     * <platinum-bluetooth-device services-filter='["battery_service"]'
+     *                            name-filter='foobar'>
+     * </platinum-bluetooth-device>
      * ```
      *
      * [1]: https://developers.google.com/web/updates/2015/07/interact-with-ble-devices-on-the-web
@@ -83,7 +104,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
          */
         servicesFilter: {
           type: Array,
-          observer: '_servicesFilterChanged'
+          observer: '_filterChanged'
+        },
+
+        /**
+         * Device name filter.
+         */
+        nameFilter: {
+          type: String,
+          observer: '_filterChanged'
+        },
+
+        /**
+         * Device name prefix filter.
+         */
+        namePrefixFilter: {
+          type: String,
+          observer: '_filterChanged'
         },
 
         /**
@@ -107,9 +144,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
 
       /**
-       * Reset device when services-filter property is changed.
+       * Reset device when services-filter, name-filter or name-prefix-filter
+       * property is changed.
        */
-      _servicesFilterChanged: function() {
+      _filterChanged: function() {
         this._device = null;
       },
 
@@ -126,7 +164,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       /**
        * Request a nearby bluetooth device and returns a Promise that will
-       * resolve when user picked one Bluetooth device.
+       * resolve when user picked one Bluetooth device based on filters.
        *
        * It must be called on user gesture.
        *
@@ -141,11 +179,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           // Resolve promise if user already picked one device.
           return Promise.resolve(this._device);
         }
-        if (!this.servicesFilter || this.servicesFilter.length == 0) {
-          return Promise.reject(new Error('Please set Bluetooth services filter.'));
+
+        var options = {filters: []};
+        if (this.servicesFilter) {
+          options.filters.push({services: this.servicesFilter});
+        }
+        if (this.nameFilter) {
+          options.filters.push({name: this.nameFilter});
+        }
+        if (this.namePrefixFilter) {
+          options.filters.push({namePrefix: this.namePrefixFilter});
+        }
+
+        if (options.filters.length == 0) {
+          return Promise.reject(new Error('Please set Bluetooth options filters.'));
         }
         var self = this;
-        return navigator.bluetooth.requestDevice({filters:[{services: this.servicesFilter}]})
+        return navigator.bluetooth.requestDevice(options)
           .then(function(device) {
             // Cache device for later use.
             self._device = device;
