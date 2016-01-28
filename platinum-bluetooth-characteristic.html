@@ -263,7 +263,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         _characteristic: {
           readOnly: true,
           type: BluetoothGATTCharacteristic
-        },
+        }
 
       },
 
@@ -473,7 +473,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return this._connectToDevice()
           .then(function() { return self._getPrimaryService() })
           .then(function() { return self._getCharacteristic() })
-          .then(function() { return self._readCharacteristic() })
+          .then(function() { return self._readCharacteristic() });
       },
 
       /**
@@ -488,7 +488,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return this._connectToDevice()
           .then(function() { return self._getPrimaryService() })
           .then(function() { return self._getCharacteristic() })
-          .then(function() { return self._writeCharacteristic(value) })
+          .then(function() { return self._writeCharacteristic(value) });
       },
 
       /**
@@ -502,7 +502,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return this._connectToDevice()
           .then(function() { return self._getPrimaryService() })
           .then(function() { return self._getCharacteristic() })
-          .then(function() { return self._startNotifications() })
+          .then(function() { return self._startNotifications() });
       },
 
       /**
@@ -516,8 +516,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return this._connectToDevice()
           .then(function() { return self._getPrimaryService() })
           .then(function() { return self._getCharacteristic() })
-          .then(function() { return self._stopNotifications() })
-      },
+          .then(function() { return self._stopNotifications() });
+      }
 
     });
   })();
