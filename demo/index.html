@@ -61,9 +61,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-material id="container" elevation="1">
       <paper-item>
         <paper-item-body>
-        <div>The <a href="https://github.com/WebBluetoothCG/web-bluetooth">Web Bluetooth API</a> discovers and communicates with devices over the Bluetooth 4 wireless standard using the <a href="https://developer.bluetooth.org/TechnologyOverview/Pages/GATT.aspx">Generic Attribute Profile (GATT)</a>. It is currently only partially implemented in Chrome OS behind the experimental flag <code>chrome://flags/#enable-web-bluetooth</code>.</div>
+        <div>The <a href="https://github.com/WebBluetoothCG/web-bluetooth">Web Bluetooth API</a> discovers and communicates with devices over the Bluetooth 4 wireless standard using the <a href="https://developer.bluetooth.org/TechnologyOverview/Pages/GATT.aspx">Generic Attribute Profile (GATT)</a>. It is currently only partially implemented in Chrome OS 45 and Chrome 49 for Android behind the experimental flag <code>chrome://flags/#enable-web-bluetooth</code>.</div>
         <br/>
-        <div>This demo illustrates the use of the Web Bluetooth API to retrieve battery information, body sensor location, reset energy expended and start/stop heart rate notifications from a nearby Bluetooth Device advertising Battery and Heart Rate information with Bluetooth Low Energy. You may want to try it with the BLE Peripheral Simulator App from the <a target="_blank" href="https://play.google.com/store/apps/details?id=io.github.webbluetoothcg.bletestperipheral">Google Play Store</a>.</div>
+        <div>This demo illustrates the use of the Web Bluetooth API to retrieve battery information and body sensor location, reset energy expended and start/stop heart rate notifications from a nearby Bluetooth Device advertising Battery and Heart Rate information with Bluetooth Low Energy. You may want to try it with the BLE Peripheral Simulator App from the <a target="_blank" href="https://play.google.com/store/apps/details?id=io.github.webbluetoothcg.bletestperipheral">Google Play Store</a>.</div>
         </paper-item-body>
       </paper-item>
 
@@ -102,7 +102,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </platinum-bluetooth-characteristic>
         <platinum-bluetooth-characteristic characteristic="heart_rate_control_point">
         </platinum-bluetooth-characteristic>
-        <platinum-bluetooth-characteristic characteristic="heart_rate_measurement">
+        <platinum-bluetooth-characteristic characteristic="heart_rate_measurement"
+                                           on-value-changed="parseHeartRate">
         </platinum-bluetooth-characteristic>
       </platinum-bluetooth-service>
     </platinum-bluetooth-device>
@@ -171,7 +172,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return heartRateMeasurement.startNotifications().then(function() {
               template.text = device.name + ' Notifications session has started.';
               progressBar.indeterminate = false;
-              heartRateMeasurement.addEventListener('value-changed', parseHeartRate);
             })
           })
           .catch(onError);
@@ -182,7 +182,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return heartRateMeasurement.stopNotifications().then(function() {
               template.text = device.name + ' Notifications session has stopped.';
               progressBar.indeterminate = false;
-              heartRateMeasurement.removeEventListener('value-changed', parseHeartRate);
             })
           })
           .catch(onError);
@@ -195,7 +194,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           progressBar.indeterminate = false;
         });
 
-        function parseHeartRate(event) {
+        template.parseHeartRate = function(event) {
           var data = event.target.value;
           var flags = data.getUint8(0);
           var rate16Bits = flags & 0x1;
@@ -227,7 +226,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             result.rrIntervals = rrIntervals;
           }
           template.text = JSON.stringify(result, null, 2);
-        }
+        };
 
         function buttonClick() {
           progressBar.indeterminate = true;

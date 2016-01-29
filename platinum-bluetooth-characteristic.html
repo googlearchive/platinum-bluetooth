@@ -41,7 +41,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      * The `<platinum-bluetooth-characteristic>` element allows you to [read
      * and write characteristics on nearby bluetooth devices][1] thanks to the
      * young [Web Bluetooth API][2]. It is currently only partially implemented
-     * in Chrome OS 45 behind the experimental flag
+     * in Chrome OS 45 and Chrome 49 for Android behind the experimental flag
      * `chrome://flags/#enable-web-bluetooth`.
      *
      * `<platinum-bluetooth-characteristic>` needs to be a child of a
@@ -125,12 +125,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      * });
      * ```
      *
-     * Starting and stopping notifications on a `<platinum-bluetooth-characteristic>` is pretty straightforward when taking advantage of [Polymer Change notification protocol](https://www.polymer-project.org/1.0/docs/devguide/data-binding.html#change-notification-protocol). Here's how to get your Heart Rate Measurement for instance:
+     * Starting and stopping notifications on a `<platinum-bluetooth-characteristic>` is pretty straightforward when taking advantage of the [Polymer Change notification protocol](https://www.polymer-project.org/1.0/docs/devguide/data-binding.html#change-notification-protocol). Here's how to get your Heart Rate Measurement for instance:
      *
      * ```html
      * <platinum-bluetooth-device services-filter='["heart_rate"]'>
      *   <platinum-bluetooth-service service='heart_rate'>
-     *     <platinum-bluetooth-characteristic characteristic='heart_rate_measurement'>
+     *     <platinum-bluetooth-characteristic characteristic='heart_rate_measurement'
+     *                                        on-value-changed='parseHeartRate'>
      *     </platinum-bluetooth-characteristic>
      *   </platinum-bluetooth-service>
      * </platinum-bluetooth-device>
@@ -141,21 +142,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      *
      * startButton.addEventListener('click', function() {
      *   bluetoothDevice.request().then(function() {
-     *     return heartRate.startNotifications().then(function() {
-     *       heartRate.addEventListener('value-changed', handleValueChanged);
-     *     });
-     *   })
-     *   .catch(function(error) { });
+     *     return heartRate.startNotifications().catch(function(error) { });
+     *   });
      * });
      *
      * stopButton.addEventListener('click', function() {
-     *   heartRate.stopNotifications().then(function() {
-     *     heartRate.removeEventListener('value-changed', handleValueChanged);
-     *   })
-     *   .catch(function(error) { });
+     *   heartRate.stopNotifications().catch(function(error) { });
      * });
      *
-     * function handleValueChanged(event) {
+     * function parseHeartRate(event) {
      *  let value = event.target.value;
      *  // Do something with the DataView Object value...
      * }
@@ -351,6 +346,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return this._service.getCharacteristic(this.characteristic)
           .then(function(characteristic) {
             self._set_characteristic(characteristic);
+            self._characteristic.addEventListener('characteristicvaluechanged', self._handleValueChanged.bind(self));
             return self._characteristic;
           });
       },
@@ -407,7 +403,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (!this._characteristic) {
           return Promise.reject(new Error('Bluetooth GATT Characteristic is not connected.'));
         }
-        this._characteristic.addEventListener('characteristicvaluechanged', this._handleValueChanged.bind(this));
         return this._characteristic.startNotifications();
       },
 
@@ -421,7 +416,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (!this._characteristic) {
           return Promise.reject(new Error('Bluetooth GATT Characteristic is not connected.'));
         }
-        this._characteristic.removeEventListener('characteristicvaluechanged', this._handleValueChanged.bind(this));
         return this._characteristic.stopNotifications();
       },
 

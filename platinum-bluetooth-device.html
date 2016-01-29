@@ -31,8 +31,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     /**
      * The `<platinum-bluetooth-device>` element allows you to [discover nearby
      * bluetooth devices][1] thanks to the young [Web Bluetooth API][2]. It is
-     * currently only partially implemented in Chrome OS 45 behind the
-     * experimental flag `chrome://flags/#enable-web-bluetooth`.
+     * currently only partially implemented in Chrome OS 45 and Chrome 49 for
+     * Android behind the experimental flag
+     * `chrome://flags/#enable-web-bluetooth`.
      *
      * `<platinum-bluetooth-device>` is used as a parent element for
      * `<platinum-bluetooth-service>` child elements.
@@ -133,10 +134,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         /**
-         * Internal variable used to cache Bluetooth device.
+         * Current Bluetooth device picked by user.
          */
-        _device: {
+        device: {
           type: BluetoothDevice,
+          readOnly: true,
           observer: '_deviceChanged'
         }
 
@@ -148,7 +150,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _deviceChanged: function() {
         this._services = Polymer.dom(this.$.services).getDistributedNodes();
         for (var i = 0; i < this._services.length; i++) {
-          this._services[i]._device = this._device;
+          this._services[i]._device = this.device;
         }
       },
 
@@ -157,7 +159,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * property is changed.
        */
       _filterChanged: function() {
-        this._device = null;
+        this._setDevice(null);
       },
 
       created: function() {
@@ -168,7 +170,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * Reset device to pick a new device.
        */
       reset: function() {
-        this._device = null;
+        this._setDevice(null);
       },
 
       /**
@@ -183,10 +185,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (!this.supported) {
           return Promise.reject(new Error('Your browser does not support Bluetooth'));
         }
-        if (this._device) {
+        if (this.device) {
           this._deviceChanged();
           // Resolve promise if user already picked one device.
-          return Promise.resolve(this._device);
+          return Promise.resolve(this.device);
         }
 
         var options = {filters: []};
@@ -207,8 +209,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return navigator.bluetooth.requestDevice(options)
           .then(function(device) {
             // Cache device for later use.
-            self._device = device;
-            return self._device;
+            self._setDevice(device);
+            return self.device;
           });
       },
 
