@@ -12,9 +12,9 @@ thing! https://github.com/PolymerLabs/tedium/issues
 
 -->
 
-[![Build Status](https://travis-ci.org/PolymerElements/platinum-bluetooth.svg?branch=master)](https://travis-ci.org/PolymerElements/platinum-bluetooth)
+[![Build status](https://travis-ci.org/PolymerElements/platinum-bluetooth.svg?branch=master)](https://travis-ci.org/PolymerElements/platinum-bluetooth)
 
-_[Demo and API Docs](https://elements.polymer-project.org/elements/platinum-bluetooth)_
+_[Demo and API docs](https://elements.polymer-project.org/elements/platinum-bluetooth)_
 
 
 ##&lt;platinum-bluetooth-characteristic&gt;
