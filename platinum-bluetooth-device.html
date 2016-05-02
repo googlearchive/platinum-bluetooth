@@ -75,6 +75,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      * </platinum-bluetooth-device>
      * ```
      *
+     * If you filter just by name, then you must use `optional-services-filter`
+     * to get access to any services:
+     *
+     * ```html
+     * <platinum-bluetooth-device name=filter='foobar'
+     *                            optional-services-filter='["battery_service"]'>
+     * </platinum-bluetooth-device>
+     * ```
+     *
      * Disconnecting manually from a connected bluetooth device is pretty
      * straightforward:
      *
@@ -108,7 +117,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         /**
-         * Required Bluetooth GATT services filter. You may provide either the
+         * Bluetooth GATT services filter. You may provide either the
          * full Bluetooth UUID as a string or a short 16- or 32-bit form as
          * integers like 0x180d.
          */
@@ -130,6 +139,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
          */
         namePrefixFilter: {
           type: String,
+          observer: '_filterChanged'
+        },
+
+        /**
+         * Optional Bluetooth GATT services filter. This implies that if you
+         * filter just by name, you must use `optionalServicesFilter` to get
+         * access to any services. You may provide either the full Bluetooth
+         * UUID as a string or a short 16- or 32-bit form as integers like
+         * 0x180d.
+         */
+        optionalServicesFilter: {
+          type: Array,
           observer: '_filterChanged'
         },
 
@@ -200,6 +221,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         if (this.namePrefixFilter) {
           options.filters.push({namePrefix: this.namePrefixFilter});
+        }
+        if (this.optionalServicesFilter) {
+          options.optionalServices = this.optionalServicesFilter;
         }
 
         if (options.filters.length == 0) {
