@@ -291,7 +291,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return Promise.reject(new Error('Bluetooth device is not connected.'));
         }
         var self = this;
-        return this._device.connectGATT()
+        return this._device.gatt.connect()
           .then(function(server) {
             self._set_server(server);
             return self._server;
