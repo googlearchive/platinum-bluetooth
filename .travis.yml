@@ -28,10 +28,9 @@ env:
     - secure: >-
         fmSQUmVuhIGyEZUQNHCZZunWWb0+27mBHUiVdwadTUiQbtIqBm63ymIOLHVqEN1geIS8/AYsbfj2ELObRNWpdULwFbPs8VugHswOin/ezKidFBHFQwJ58cBKjzOebixfJlEUsoDa5COJz/TC1q4nfsgzT8p5r2uK2rDVbp2mgjOyMOIcudtpaUdf3M4HWyJdPqFRTjG4Cce972y7Bs4H+WFp14IWoN3t81jBrE6vnc94u4+Z1ENGZwW/hrKFWR7UOuL7KnrEe/MR4aJhYn6O06KS+Wr2LcZPCzfvtda6zjbGwC07mXyJJvlYs4XJpUiNZBzGgM3LpA/5CgzPEwmdNKtVu6WbBN8DMW6fPQdWiUuio3Uc/kpzLC3bUnZDiHMtBrLBMJFkSFWDmlR/ZTx/iQycC1oYnQX+wX1pn6cFoU+dTvgS7MRCgp+5MEamI/N7WzaPXET0VrONcE5OW5UN8yDJ4F+fAbELYN9EbeIhmZ5KFEvRd7NC6nXO8U0WtTUALTzHxu8BFFcmUz/9JdZzTxs/FcYuD29qTBMhg0McLCcjne6NGNqCPPEDT9uojGz+OOuGkMBRqknwJ7OgIcum8gOxmcXUG/Ola1JkRqIiJTWh7GT30b/OeEoBMCeUfon+9OEX/r/4BvRB4QQw4hfKZm3fpB3ewRjRtIQBOrr3z7A=
 dist: trusty
-node_js: stable
+node_js: '6'
 addons:
-  firefox: '46.0'
-  sauce_connect: true
+  firefox: latest
   apt:
     sources:
       - google-chrome
