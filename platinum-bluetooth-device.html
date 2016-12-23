@@ -93,6 +93,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      * });
      * ```
      *
+     * And here's how to listen to disconnections with `on-disconnected`:
+     *
+     * ```html
+     * <platinum-bluetooth-device services-filter='["battery_service"]'
+     *                            on-disconnected='handleDisconnection'>
+     * </platinum-bluetooth-device>
+     * ```
+     *
      * [1]: https://developers.google.com/web/updates/2015/07/interact-with-ble-devices-on-the-web
      * [2]: https://github.com/WebBluetoothCG/web-bluetooth
      * [3]: https://developers.google.com/web/updates/2015/07/interact-with-ble-devices-on-the-web#available-for-origin-trials
@@ -175,6 +183,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * @param {BluetoothDevice} The device
        */
 
+      /**
+       * Fired when Bluetooth device picked by user gets disconnected.
+       *
+       * @event disconnected
+       * @param {BluetoothDevice} The device
+       */
 
       /**
        * Update all services when device changes.
@@ -245,6 +259,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           .then(function(device) {
             // Cache device for later use.
             self._setDevice(device);
+            device.addEventListener('gattserverdisconnected', function(event) {
+              self.fire('disconnected', event.target.device);
+            });
             return self.device;
           });
       },
