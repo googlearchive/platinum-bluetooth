@@ -90,14 +90,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </paper-item>
     </paper-material>
 
-    <platinum-bluetooth-device services-filter='["battery_service"]' id="battery-device">
+    <platinum-bluetooth-device services-filter='["battery_service"]' id="battery-device" on-disconnected="handleDisconnection">
       <platinum-bluetooth-service service="battery_service">
         <platinum-bluetooth-characteristic characteristic="battery_level">
         </platinum-bluetooth-characteristic>
       </platinum-bluetooth-service>
     </platinum-bluetooth-device>
 
-    <platinum-bluetooth-device services-filter='["heart_rate"]' id="heart-rate-device">
+    <platinum-bluetooth-device services-filter='["heart_rate"]' id="heart-rate-device" on-disconnected="handleDisconnection">
       <platinum-bluetooth-service service="heart_rate">
         <platinum-bluetooth-characteristic characteristic="body_sensor_location">
         </platinum-bluetooth-characteristic>
@@ -191,8 +191,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         disconnectButton.addEventListener('click', function() {
           heartRateDevice.disconnect();
           batteryDevice.disconnect();
-          template.text = 'Bluetooth device(s) disconnected.';
-          progressBar.indeterminate = false;
         });
 
         template.parseHeartRate = function(event) {
@@ -227,6 +225,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             result.rrIntervals = rrIntervals;
           }
           template.text = JSON.stringify(result, null, 2);
+        };
+
+        template.handleDisconnection = function(event) {
+          template.text = 'Bluetooth device(s) disconnected.';
+          progressBar.indeterminate = false;
         };
 
         function buttonClick() {
