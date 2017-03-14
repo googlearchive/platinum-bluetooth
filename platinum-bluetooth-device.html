@@ -84,6 +84,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      * </platinum-bluetooth-device>
      * ```
      *
+     * If you accept all devices to be requested, then you must use
+     * `accept-all-devices` to get access to any devices nearby. If you use it,
+     * you will only be able to use services listed in `optional-services-filter`:
+     *
+     * ```html
+     * <platinum-bluetooth-device accept-all-devices
+     *                            optional-services-filter='["battery_service"]'>
+     * </platinum-bluetooth-device>
+     * ```
+     *
      * Disconnecting manually from a connected bluetooth device is pretty
      * straightforward:
      *
@@ -156,6 +166,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         /**
+         * In rare cases, a device may not advertise enough distinguishing
+         * information to let a site filter out uninteresting devices. In
+         * those cases, a site can set acceptAllDevices to true and omit all
+         * filters. This puts the burden of selecting the right device
+         * entirely on the site’s users. If a site uses acceptAllDevices, it
+         * will only be able to use services listed in optionalServices.
+         */
+        acceptAllDevices: {
+          type: Boolean,
+          observer: '_filterChanged'
+        },
+
+        /**
          * Current Bluetooth device picked by user.
          */
         device: {
@@ -224,6 +247,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         var options = {filters: []};
+
         if (this.servicesFilter) {
           options.filters.push({services: this.servicesFilter});
         }
@@ -232,14 +256,38 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         if (this.namePrefixFilter) {
           options.filters.push({namePrefix: this.namePrefixFilter});
+        } else if (this.namePrefixFilter === "") {
+          return Promise.reject(new Error('Bluetooth options namePrefixFilter must be non-empty to filter devices.'));
         }
         if (this.optionalServicesFilter) {
           options.optionalServices = this.optionalServicesFilter;
         }
-
-        if (options.filters.length == 0) {
-          return Promise.reject(new Error('Please set Bluetooth options filters.'));
+        if (this.acceptAllDevices) {
+          options.acceptAllDevices = true;
         }
+
+        if (options.acceptAllDevices) {
+          if (options.filters.length > 1) {
+            return Promise.reject(new Error('Please remove Bluetooth options filters if acceptAllDevices is set to true. It would override any filters.'));
+          } else if (options.filters.length == 0) {
+            delete options.filters;
+          }
+        } else {
+          if (options.filters.length == 0) {
+            return Promise.reject(new Error('Please set Bluetooth options filters. An empty list of filters doesn’t accept any devices.'));
+          } else {
+            var filtersHaveValidSyntax = options.filters.every(function(filter){
+              return filter != undefined && filter !== {};
+            });
+            if (!filtersHaveValidSyntax) {
+              return Promise.reject(new Error('Please set Bluetooth options filters with a valid syntax. Empty/invalid filters accept all devices and it’s not allowed.'));
+            }
+          }
+        }
+        if (options === {}) {
+          return Promise.reject(new Error('Please set Bluetooth options. An absent list of filters doesn’t accept any devices.'));
+        }
+
         var self = this;
         return navigator.bluetooth.requestDevice(options)
           .then(function(device) {
