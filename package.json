@@ -1,0 +1,20 @@
+{
+  "name": "@polymer/platinum-bluetooth",
+  "flat": true,
+  "version": "3.0.0-pre.1",
+  "description": "A set of Polymer elements to discover and communicate with nearby Bluetooth devices",
+  "contributors": [
+    "The Polymer Authors"
+  ],
+  "keywords": [
+    "bluetooth"
+  ],
+  "main": "platinum-bluetooth-elements.html",
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/PolymerElements/platinum-bluetooth/",
+  "dependencies": {
+    "@polymer/polymer": "^3.0.0-pre.1",
+    "@polymer/promise-polyfill": "^3.0.0-pre.1"
+  },
+  "devDependencies": {}
+}

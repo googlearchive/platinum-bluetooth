@@ -16,19 +16,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
 
-    <link rel="import" href="../platinum-bluetooth-device.html">
+    <script type="module" src="../platinum-bluetooth-device.js"></script>
   </head>
 
   <body>
     <platinum-bluetooth-device></platinum-bluetooth-device>
 
-    <script>
-      var bluetooth = document.querySelector('platinum-bluetooth-device');
-      suite('Unsupported', function() {
-        test('supported state is properly set', function() {
-          assert.isFalse(bluetooth.supported);
-        });
-      });
-    </script>
+    <script type="module">
+import '../platinum-bluetooth-device.js';
+var bluetooth = document.querySelector('platinum-bluetooth-device');
+suite('Unsupported', function() {
+  test('supported state is properly set', function() {
+    assert.isFalse(bluetooth.supported);
+  });
+});
+</script>
   </body>
 </html>
