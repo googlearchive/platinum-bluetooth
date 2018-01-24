@@ -13,40 +13,40 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
 
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../../@webcomponents/webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../../wct-browser-legacy/browser.js"></script>
 
-    <link rel="import" href="../platinum-bluetooth-device.html">
+    <script type="module" src="../platinum-bluetooth-device.js"></script>
   </head>
 
   <body>
     <platinum-bluetooth-device></platinum-bluetooth-device>
 
-    <script>
-      var bluetoothDevice = document.querySelector('platinum-bluetooth-device');
+    <script type="module">
+import '../platinum-bluetooth-device.js';
+var bluetoothDevice = document.querySelector('platinum-bluetooth-device');
 
-      suite('Supported', function() {
-        test('supported state is properly set', function() {
-          assert.isTrue(bluetoothDevice.supported);
-        });
-      });
+suite('Supported', function() {
+  test('supported state is properly set', function() {
+    assert.isTrue(bluetoothDevice.supported);
+  });
+});
 
-      suite('Requesting device assuming Bluetooth Adapter is ON', function() {
-        test('Empty filters returns error', function(done) {
-          bluetoothDevice.request()
-          .catch(function(error) {
-            assert.equal(error.message, 'Please set Bluetooth services filter.');
-          }).then(done, done);
-        });
-        test('User gesture is mandatory', function(done) {
-          bluetoothDevice.setAttribute('services-filter', '["battery_service"]');
-          bluetoothDevice.request()
-          .catch(function(error) {
-            assert.equal(error.message, 'Must be handling a user gesture to show a permission request.');
-          }).then(done, done);
-        });
-      });
-
-    </script>
+suite('Requesting device assuming Bluetooth Adapter is ON', function() {
+  test('Empty filters returns error', function(done) {
+    bluetoothDevice.request()
+    .catch(function(error) {
+      assert.equal(error.message, 'Please set Bluetooth services filter.');
+    }).then(done, done);
+  });
+  test('User gesture is mandatory', function(done) {
+    bluetoothDevice.setAttribute('services-filter', '["battery_service"]');
+    bluetoothDevice.request()
+    .catch(function(error) {
+      assert.equal(error.message, 'Must be handling a user gesture to show a permission request.');
+    }).then(done, done);
+  });
+});
+</script>
   </body>
 </html>
